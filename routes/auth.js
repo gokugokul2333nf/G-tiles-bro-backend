@@ -85,7 +85,11 @@ router.post(
       });
       res.status(500).json({
         success: false,
-        message: 'Server error. Please try again later.',
+        message: `Server Error: ${err.message}`,
+        debug: {
+          msg: err.message,
+          hasJwtSecret: !!process.env.JWT_SECRET
+        }
       });
     }
   }
@@ -149,7 +153,11 @@ router.post(
       });
       res.status(500).json({
         success: false,
-        message: 'Server error. Please try again later.',
+        message: `Server Error: ${err.message}`,
+        debug: {
+          msg: err.message,
+          hasJwtSecret: !!process.env.JWT_SECRET
+        }
       });
     }
   }
