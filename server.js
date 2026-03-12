@@ -75,4 +75,12 @@ app.use((err, _req, res, _next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  
+  // Check for critical environment variables
+  const criticalEnv = ['JWT_SECRET', 'MONGODB_URI'];
+  const missing = criticalEnv.filter(env => !process.env[env]);
+  if (missing.length > 0) {
+    console.warn(`⚠️  WARNING: Missing critical environment variables: ${missing.join(', ')}`);
+    console.warn('Authentication and Database features may fail!');
+  }
 });
