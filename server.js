@@ -12,11 +12,16 @@ const app = express();
 app.use(
   cors({
     origin: [
-      process.env.CLIENT_URL || 'http://localhost:3003',
+      process.env.CLIENT_URL || 'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:3002',
+      'http://localhost:3003',
+      'https://g-tiles-bro-frontend-besxllftr.vercel.app',
+      'https://g-tiles-bro-frontend.vercel.app',
     ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 app.use(express.json({ limit: '10mb' }));
