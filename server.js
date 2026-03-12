@@ -9,16 +9,25 @@ connectDB();
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:3002',
+  'http://localhost:3003',
+  'https://g-tiles-bro-frontend.vercel.app',
+];
+
 app.use(
   cors({
-    origin: [
-      process.env.CLIENT_URL || 'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:3002',
-      'http://localhost:3003',
-      'https://g-tiles-bro-frontend-besxllftr.vercel.app',
-      'https://g-tiles-bro-frontend.vercel.app',
-    ],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl) 
+      // or from allowed origins or any vercel.app subdomain
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
