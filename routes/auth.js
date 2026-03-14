@@ -319,4 +319,61 @@ router.delete('/users/:id', protect, async (req, res) => {
   }
 });
 
+// @route   PUT /api/auth/location
+// @desc    Update current user's location
+// @access  Private
+router.put(
+  '/location',
+  protect,
+  [
+    body('latitude').isNumeric().withMessage('Latitude must be a number'),
+    body('longitude').isNumeric().withMessage('Longitude must be a number'),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, message: errors.array()[0].msg });
+    }
+
+    try {
+      const user = await User.findById(req.user._id);
+      user.location = {
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
+        lastLocationUpdate: new Date(),
+      };
+      await user.save({ validateBeforeSave: false });
+
+      res.status(200).json({
+        success: true,
+        message: 'Location updated successfully',
+        location: user.location,
+      });
+    } catch (err) {
+      console.error('Location update error:', err);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  }
+);
+
+// @route   GET /api/auth/marketing-locations
+// @desc    Get locations of all marketing staff (admin only)
+// @access  Private/Admin
+router.get('/marketing-locations', protect, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ success: false, message: 'Forbidden' });
+  }
+
+  try {
+    const marketingStaff = await User.find({ role: 'marketing' }).select('name email location');
+    res.status(200).json({
+      success: true,
+      staff: marketingStaff,
+    });
+  } catch (err) {
+    console.error('Marketing locations fetch error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 module.exports = router;
